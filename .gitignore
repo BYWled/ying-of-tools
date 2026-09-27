@@ -1,0 +1,8 @@
+node_modules
+dist
+public/ffmpeg
+src/vendor/ffmpeg-worker
+test-fixtures
+gui-test-screenshots
+*.local
+.DS_Store
