@@ -1,0 +1,8 @@
+# Cloudflare Workers 静态资产部署配置
+# Workers Builds 连接 GitHub 后：构建命令 `pnpm build`，部署命令 `npx wrangler deploy`
+name = "ying-tools"
+compatibility_date = "2026-09-01"
+
+[assets]
+directory = "./dist"
+not_found_handling = "single-page-application"
