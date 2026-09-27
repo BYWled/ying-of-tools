@@ -1,3 +1,6 @@
+packages:
+  - .
+# pnpm 11 的构建脚本审批字段（pnpm 10 忽略此字段，10.x 下未审批构建仅为警告，不影响构建）
 allowBuilds:
   core-js: true
   esbuild: true
