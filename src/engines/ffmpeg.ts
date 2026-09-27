@@ -47,7 +47,11 @@ export const useFfmpeg = create<FfmpegState>((set) => ({
           ;(ff as unknown as { __logs?: string[] }).__logs = logs
         })
 
-        const base = mt ? '/ffmpeg/mt' : '/ffmpeg/st'
+        // ffmpeg 核心从 jsdelivr CDN 拉取（Workers 静态资产单文件上限 25MiB，无法自托管 30MB 的 wasm）；
+        // 仅引擎文件走 CDN，转换本身仍完全在本地执行。首次拉取后浏览器缓存。
+        const base = mt
+          ? 'https://cdn.jsdelivr.net/npm/@ffmpeg/core-mt@0.12.10/dist/esm'
+          : 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm'
         const [coreURL, wasmURL] = await Promise.all([
           toBlobURL(`${base}/ffmpeg-core.js`, 'text/javascript'),
           toBlobURL(`${base}/ffmpeg-core.wasm`, 'application/wasm', true, (e) => {
