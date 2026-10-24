@@ -1,11 +1,34 @@
-import mammoth from 'mammoth'
-import TurndownService from 'turndown'
-import { marked } from 'marked'
-import Papa from 'papaparse'
-import * as XLSX from 'xlsx'
+// mammoth / turndown / marked / papaparse / xlsx / pdf.js 按分支动态加载，
+// 保证任一文档工具只拉取真正需要的解析器。
 import type { ConverterModule, FieldOption, ResultFile } from '@/config/types'
 import { baseName, extOf } from '@/lib/utils'
-import { extractPdfText, loadPdf } from './pdf'
+
+/** docx → HTML 的轻量依赖封装 */
+async function docxToHtml(file: File): Promise<string> {
+  const mammoth = await import('mammoth')
+  const { value: html } = await mammoth.convertToHtml({ arrayBuffer: await file.arrayBuffer() })
+  return html
+}
+
+async function docxToRawText(file: File): Promise<string> {
+  const mammoth = await import('mammoth')
+  const { value } = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() })
+  return value
+}
+
+async function htmlToMarkdown(html: string): Promise<string> {
+  const { default: TurndownService } = await import('turndown')
+  return new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced' }).turndown(html)
+}
+
+async function markdownToHtml(md: string): Promise<string> {
+  const { marked } = await import('marked')
+  return marked.parse(md)
+}
+
+async function loadXLSX() {
+  return import('xlsx')
+}
 
 /* ─────────────────────────── 目标格式表 ─────────────────────────── */
 
@@ -347,15 +370,15 @@ export const docsConvert: ConverterModule = {
         return [{ name: `${base}.pdf`, blob }]
       }
       if (target === 'txt') {
-        const { value } = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() })
+        const value = await docxToRawText(file)
         return [{ name: `${base}.txt`, blob: textBlob(value), preview: value.slice(0, 4000) }]
       }
-      const { value: html } = await mammoth.convertToHtml({ arrayBuffer: await file.arrayBuffer() })
+      const html = await docxToHtml(file)
       if (target === 'html') {
         const full = HTML_SHELL(html)
         return [{ name: `${base}.html`, blob: textBlob(full, 'text/html'), preview: full.slice(0, 2000) }]
       }
-      const md = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced' }).turndown(html)
+      const md = await htmlToMarkdown(html)
       return [{ name: `${base}.md`, blob: textBlob(md, 'text/markdown'), preview: md.slice(0, 4000) }]
     }
 
@@ -364,12 +387,12 @@ export const docsConvert: ConverterModule = {
       const md = await file.text()
       if (target === 'txt') return [{ name: `${base}.txt`, blob: textBlob(md), preview: md.slice(0, 4000) }]
       if (target === 'pdf') {
-        const inner = await marked.parse(md)
+        const inner = await markdownToHtml(md)
         const blob = await rasterizeHtmlToPdf(inner, ctx.onProgress)
         return [{ name: `${base}.pdf`, blob }]
       }
       if (target === 'html') {
-        const inner = await marked.parse(md)
+        const inner = await markdownToHtml(md)
         const full = HTML_SHELL(inner)
         return [{ name: `${base}.html`, blob: textBlob(full, 'text/html'), preview: full.slice(0, 2000) }]
       }
@@ -386,9 +409,7 @@ export const docsConvert: ConverterModule = {
         return [{ name: `${base}.pdf`, blob }]
       }
       if (target === 'md') {
-        const md = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced' }).turndown(
-          doc.body.innerHTML,
-        )
+        const md = await htmlToMarkdown(doc.body.innerHTML)
         return [{ name: `${base}.md`, blob: textBlob(md, 'text/markdown'), preview: md.slice(0, 4000) }]
       }
       const text = doc.body.innerText
@@ -411,6 +432,7 @@ export const docsConvert: ConverterModule = {
 
     // PDF 源
     if (srcExt === 'pdf') {
+      const { loadPdf, extractPdfText } = await import('./pdf')
       const doc = await loadPdf(file)
       const text = await extractPdfText(doc, ctx.onProgress)
       if (target === 'md') {
@@ -425,6 +447,7 @@ export const docsConvert: ConverterModule = {
 
     // 表格源
     if (srcExt === 'xlsx' || srcExt === 'xls') {
+      const XLSX = await loadXLSX()
       const wb = XLSX.read(await file.arrayBuffer(), { type: 'array' })
       const sheetNames = s.sheets === 'all' ? wb.SheetNames : wb.SheetNames.slice(0, 1)
       if (!sheetNames.length) throw new Error('工作簿中没有工作表')
@@ -455,12 +478,14 @@ export const docsConvert: ConverterModule = {
     }
 
     if (srcExt === 'csv') {
+      const Papa = (await import('papaparse')).default
       const text = await file.text()
       const parsed = Papa.parse<Record<string, string>>(text, { header: true, skipEmptyLines: true })
       if (target === 'json') {
         const json = JSON.stringify(parsed.data, null, 2)
         return [{ name: `${base}.json`, blob: textBlob(json, 'application/json'), preview: json.slice(0, 4000) }]
       }
+      const XLSX = await loadXLSX()
       const ws = XLSX.utils.json_to_sheet(parsed.data)
       const wb = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')
@@ -482,9 +507,11 @@ export const docsConvert: ConverterModule = {
         throw new Error('需要「对象数组」格式的 JSON（如 [{...},{...}]）')
       }
       if (target === 'csv') {
+        const Papa = (await import('papaparse')).default
         const csv = Papa.unparse(rows as Record<string, unknown>[], { delimiter: String(s.delimiter || ',') })
         return [{ name: `${base}.csv`, blob: textBlob(csv, 'text/csv'), preview: csv.slice(0, 3000) }]
       }
+      const XLSX = await loadXLSX()
       const ws = XLSX.utils.json_to_sheet(rows as Record<string, unknown>[])
       const wb = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')

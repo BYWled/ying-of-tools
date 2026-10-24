@@ -1,4 +1,4 @@
-export type CategoryId = 'convert' | 'pdf' | 'image' | 'gif' | 'av' | 'more'
+export type CategoryId = 'convert' | 'pdf' | 'image' | 'gif' | 'av' | 'text' | 'dev' | 'more'
 
 export interface ResultFile {
   name: string

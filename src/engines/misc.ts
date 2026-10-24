@@ -1,10 +1,7 @@
-import { createWorker } from 'tesseract.js'
-import { md5, sha1, sha256, sha384, sha512, crc32 } from 'hash-wasm'
-import QRCode from 'qrcode'
-import jsQR from 'jsqr'
+// 重依赖（tesseract / hash-wasm / jsQR / qrcode / pdf.js）全部按需动态加载：
+// 否则任一 misc 工具都会把整条依赖链拉下来，弱网下工具半分钟无法就绪。
 import type { ConverterModule } from '@/config/types'
 import { baseName, extOf } from '@/lib/utils'
-import { loadPdf, renderPageToBlob } from './pdf'
 
 /* ─────────────────────────── OCR ─────────────────────────── */
 
@@ -26,8 +23,9 @@ export const ocr: ConverterModule = {
   ],
   async run([file], s, ctx) {
     let blob: Blob = file
-    // PDF 输入：逐页栅格化为图片再识别
+    // PDF 输入：逐页栅格化为图片再识别（仅在 PDF 分支动态拉起 pdf.js）
     if (extOf(file.name) === 'pdf' || file.type === 'application/pdf') {
+      const { loadPdf, renderPageToBlob } = await import('./pdf')
       const doc = await loadPdf(file)
       const pages: Blob[] = []
       for (let i = 1; i <= doc.numPages; i++) {
@@ -37,6 +35,7 @@ export const ocr: ConverterModule = {
       blob = new Blob(pages, { type: 'image/png' })
     }
 
+    const { createWorker } = await import('tesseract.js')
     const worker = await createWorker(String(s.lang), 1, { logger: () => {} })
     try {
       const { data } = await worker.recognize(blob)
@@ -66,6 +65,7 @@ async function imageToImageData(blob: Blob): Promise<ImageData> {
 export const qrDecode: ConverterModule = {
   fields: [],
   async run([file], _s, ctx) {
+    const jsQR = (await import('jsqr')).default
     const imageData = await imageToImageData(file)
     ctx.onProgress(0.6)
     const result = jsQR(imageData.data, imageData.width, imageData.height)
@@ -197,6 +197,7 @@ export const fileHash: ConverterModule = {
     },
   ],
   async run([file], s, ctx) {
+    const { md5, sha1, sha256, sha384, sha512, crc32 } = await import('hash-wasm')
     const buffer = await file.arrayBuffer()
     ctx.onProgress(0.3)
     const lines: string[] = [`文件：${file.name}`, `大小：${file.size} 字节`, '']
@@ -359,6 +360,7 @@ export const faviconIco: ConverterModule = {
 /* ─────────────────────────── 二维码生成（供专属页调用） ─────────────────────────── */
 
 export async function generateQrCanvas(text: string, opts: { width?: number; margin?: number; ecc?: 'L' | 'M' | 'Q' | 'H'; dark?: string; light?: string }) {
+  const QRCode = (await import('qrcode')).default
   return QRCode.toCanvas(document.createElement('canvas'), text, {
     width: opts.width ?? 512,
     margin: opts.margin ?? 2,

@@ -176,3 +176,46 @@
 .animate-blob {
   animation: blob-drift 18s ease-in-out infinite;
 }
+
+/* Markdown 预览正文（md-preview 工具） */
+.md-body h1, .md-body h2, .md-body h3, .md-body h4 {
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 1.1em 0 0.45em;
+}
+.md-body h1 { font-size: 1.5em; }
+.md-body h2 { font-size: 1.28em; }
+.md-body h3 { font-size: 1.12em; }
+.md-body p { margin: 0.6em 0; }
+.md-body ul, .md-body ol { padding-left: 1.5em; margin: 0.6em 0; }
+.md-body ul { list-style: disc; }
+.md-body ol { list-style: decimal; }
+.md-body blockquote {
+  border-left: 3px solid color-mix(in oklab, var(--primary) 60%, transparent);
+  margin: 0.8em 0;
+  padding: 2px 14px;
+  opacity: 0.85;
+}
+.md-body pre {
+  background: color-mix(in oklab, var(--muted) 70%, transparent);
+  border-radius: 8px;
+  padding: 12px 14px;
+  overflow: auto;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.md-body code {
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 0.9em;
+}
+.md-body :not(pre) > code {
+  background: color-mix(in oklab, var(--muted) 70%, transparent);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+.md-body table { border-collapse: collapse; margin: 0.8em 0; width: 100%; }
+.md-body th, .md-body td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; }
+.md-body th { background: color-mix(in oklab, var(--muted) 50%, transparent); font-weight: 600; }
+.md-body a { color: var(--primary); text-underline-offset: 3px; }
+.md-body img { max-width: 100%; border-radius: 8px; }
+.md-body hr { border: none; border-top: 1px solid var(--border); margin: 1.2em 0; }

@@ -98,6 +98,9 @@ importers:
       pdfjs-dist:
         specifier: ^4.10.38
         version: 4.10.38
+      pinyin-pro:
+        specifier: ^3.29.5
+        version: 3.29.5
       qrcode:
         specifier: ^1.5.4
         version: 1.5.4
@@ -1589,6 +1592,9 @@ packages:
     resolution: {integrity: sha512-L28STB170nwWS63UjtlEOE3dldQApaJXZkOI1uMFfzf3rRuPegHaHesyee+YxQ+W6SvRDQV6UrdOdRiR153wJg==}
     engines: {node: '>=6'}
 
+  camelize@1.0.1:
+    resolution: {integrity: sha512-dU+Tx2fsypxTgtLoE36npi3UqcjSSMNYfkqgmoEhtZrraP5VWq0K7FkWVTYa8eMPtnU/G2txVsfdCJTn9uzpuQ==}
+
   caniuse-lite@1.0.30001812:
     resolution: {integrity: sha512-qN+QNNBr93TCmFrmte0bBCjSDMuRvt78VlHT99qIGPszm4QsqCX8lnyWUFkHi8B7ZBAPq8SH+UqyXNy/odMdng==}
 
@@ -1639,8 +1645,15 @@ packages:
     engines: {node: '>=0.8'}
     hasBin: true
 
+  css-color-keywords@1.0.0:
+    resolution: {integrity: sha512-FyyrDHZKEjXDpNJYvVsV960FiqQyXc/LlYmsxl2BcdMb2WPx0OGRVgTg55rPSyLSNMqP52R9r8geSp7apN3Ofg==}
+    engines: {node: '>=4'}
+
   css-line-break@2.1.0:
     resolution: {integrity: sha512-FHcKFCZcAha3LwfVBhCQbW2nCNbkZXn7KVUJcsT5/P8YmfsVja0FMPJr0B903j/E69HUphKiV9iQArX8SDYA4w==}
+
+  css-to-react-native@3.2.0:
+    resolution: {integrity: sha512-e8RKaLXMOFii+02mOlqwjbD00KSEKqblnpO9e++1aXS1fPQOpS1YoqdVHBqPjHNoxeF2mimzVqawm2KCbEdtHQ==}
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
@@ -2116,9 +2129,15 @@ packages:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
 
+  pinyin-pro@3.29.5:
+    resolution: {integrity: sha512-Fk5YoRmtdHqJWqAuzYVG/NzvzeCbaG+ZEwbY6Nbps3QAIrvQQEtcm49frcyCM8i2b5najnzPDtYqrHRYTTiuwQ==}
+
   pngjs@5.0.0:
     resolution: {integrity: sha512-40QW5YalBNfQo5yRYmiw7Yz6TKKVr3h6970B2YE+3fQpsWcrbj1PzJgxeJ19DRQjhMbKPIuMY8rFaXc8moolVw==}
     engines: {node: '>=10.13.0'}
+
+  postcss-value-parser@4.2.0:
+    resolution: {integrity: sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==}
 
   postcss@8.5.28:
     resolution: {integrity: sha512-RRuzqDtt5Y9h3quz5hWhK+TPnsmVs6WwSU6LkJMeY4HstUEDuYTG8UJSdawMRzmzAtV+KEoG8N3Qg2qLy5vM/A==}
@@ -2324,13 +2343,10 @@ packages:
     resolution: {integrity: sha512-vAX79sfpmUerP9fsTTxoTrBDE0RuO4ahjInyWYoohNgqrdg63Ms4q6FJ/o2Fyity82NU3cujOT8Ewl9TThBdwg==}
     engines: {node: '>= 16'}
     peerDependencies:
-      css-to-react-native: '>= 3.2.0'
       react: '>= 16.8.0'
       react-dom: '>= 16.8.0'
       react-native: '>= 0.68.0'
     peerDependenciesMeta:
-      css-to-react-native:
-        optional: true
       react-dom:
         optional: true
       react-native:
@@ -3856,6 +3872,8 @@ snapshots:
 
   camelcase@5.3.1: {}
 
+  camelize@1.0.1: {}
+
   caniuse-lite@1.0.30001812: {}
 
   canvg@3.0.11:
@@ -3906,9 +3924,17 @@ snapshots:
 
   crc-32@1.2.2: {}
 
+  css-color-keywords@1.0.0: {}
+
   css-line-break@2.1.0:
     dependencies:
       utrie: 1.0.2
+
+  css-to-react-native@3.2.0:
+    dependencies:
+      camelize: 1.0.1
+      css-color-keywords: 1.0.0
+      postcss-value-parser: 4.2.0
 
   csstype@3.2.3: {}
 
@@ -4307,7 +4333,11 @@ snapshots:
 
   picomatch@4.0.7: {}
 
+  pinyin-pro@3.29.5: {}
+
   pngjs@5.0.0: {}
+
+  postcss-value-parser@4.2.0: {}
 
   postcss@8.5.28:
     dependencies:
@@ -4582,6 +4612,7 @@ snapshots:
   styled-components@6.5.3(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
     dependencies:
       '@emotion/is-prop-valid': 1.4.0
+      css-to-react-native: 3.2.0
       csstype: 3.2.3
       react: 19.3.0
       stylis: 4.3.6

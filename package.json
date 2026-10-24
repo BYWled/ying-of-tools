@@ -40,6 +40,7 @@
     "papaparse": "^5.5.0",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.10.38",
+    "pinyin-pro": "^3.29.5",
     "qrcode": "^1.5.4",
     "radix-ui": "^1.5.0",
     "react": "^19.2.0",

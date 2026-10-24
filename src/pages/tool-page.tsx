@@ -14,7 +14,7 @@ import { useFfmpeg } from '@/engines/ffmpeg'
 import { zipResults } from '@/lib/zip'
 
 function EngineBanner() {
-  const { status, progress, mt, error } = useFfmpeg()
+  const { status, progress, mt, error, receivedMb, totalMb, source, retry } = useFfmpeg()
   if (status === 'idle') return null
   return (
     <div className="bg-muted/50 space-y-2 rounded-xl border p-3">
@@ -22,17 +22,29 @@ function EngineBanner() {
         <>
           <p className="flex items-center gap-2 text-sm">
             <Loader2 className="size-4 animate-spin" />
-            正在加载转码引擎（{mt ? '多线程' : '单线程'}核心），仅首次需要，之后浏览器会缓存…
+            正在准备转码引擎{mt ? '（多线程）' : '（单线程）'}
+            {totalMb > 0 && (
+              <span className="text-muted-foreground text-xs">
+                {receivedMb} / {totalMb} MB
+              </span>
+            )}
+            ，首次约 30 MB，之后走本地缓存…
           </p>
-          <Progress value={progress} className="h-1.5" />
+          <Progress value={progress * 100} className="h-1.5" />
         </>
       )}
       {status === 'error' && (
-        <p className="text-destructive text-sm">引擎加载失败：{error}。请检查网络后刷新重试。</p>
+        <div className="space-y-2">
+          <p className="text-destructive text-sm">引擎加载失败：{error}</p>
+          <Button variant="outline" size="sm" onClick={() => void retry().catch(() => {})}>
+            重试
+          </Button>
+        </div>
       )}
       {status === 'ready' && (
         <p className="text-muted-foreground text-sm">
-          引擎已就绪（{mt ? '多线程模式' : '单线程模式'}）
+          引擎已就绪（{mt ? '多线程' : '单线程'}
+          {source ? ` · ${source}` : ''}）
         </p>
       )}
     </div>
@@ -46,6 +58,8 @@ export default function BatchToolPage() {
 
   useEffect(() => {
     if (tool?.batch) queue.initTool(tool.id, tool.batch)
+    // 进入 ffmpeg 工具页立即后台预热引擎，用户添加文件时已就绪
+    if (tool?.needsEngine === 'ffmpeg') void useFfmpeg.getState().load().catch(() => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toolId])
 

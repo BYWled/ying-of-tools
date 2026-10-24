@@ -1,4 +1,3 @@
-import { fetchFile } from '@ffmpeg/util'
 import type { ConverterModule, Settings } from '@/config/types'
 import { baseName, extOf } from '@/lib/utils'
 import { runFFmpeg, useFfmpeg } from './ffmpeg'
@@ -195,7 +194,7 @@ export const videoToGif: ConverterModule = {
   async run([file], s, ctx) {
     const ff = await useFfmpeg.getState().load()
     const inName = `in.${extOf(file.name) || 'bin'}`
-    await ff.writeFile(inName, await fetchFile(file))
+    await ff.writeFile(inName, new Uint8Array(await file.arrayBuffer()))
 
     const seek = seekArgs(s)
     const fps = Number(s.fps)
