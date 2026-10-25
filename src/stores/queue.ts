@@ -141,9 +141,10 @@ export const useQueue = create<QueueState>((set, get) => ({
           mergedResult: results,
         }))
       } else {
-        // 顺序执行，避免 wasm 大文件并发导致内存峰值
+        // 顺序执行，避免 wasm 大文件并发导致内存峰值。
+        // 已完成的文件也重跑：用户调整设置后再点「开始」应当生效，
+        // 而不是静默跳过让用户以为转换了。
         for (const item of get().items) {
-          if (item.status === 'done') continue
           set((s) => ({
             items: s.items.map((i) =>
               i.id === item.id ? { ...i, status: 'running' as const, progress: 0, error: undefined } : i,

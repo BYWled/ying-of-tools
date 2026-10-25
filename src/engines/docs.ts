@@ -3,15 +3,23 @@
 import type { ConverterModule, FieldOption, ResultFile } from '@/config/types'
 import { baseName, extOf } from '@/lib/utils'
 
-/** docx → HTML 的轻量依赖封装 */
+/** docx → HTML 的轻量依赖封装。
+ * 注意：必须加载官方预打包的 mammoth.browser，而非 mammoth 模块入口——
+ * bundler 会把 mammoth 的 jszip/pako 依赖与其它包去重共享，导致浏览器端
+ * inflate 输出长度异常（"Bug : uncompressed data size mismatch"）。 */
+async function loadMammoth() {
+  const m = await import('mammoth/mammoth.browser.js')
+  return (m as unknown as { default?: typeof m }).default ?? m
+}
+
 async function docxToHtml(file: File): Promise<string> {
-  const mammoth = await import('mammoth')
+  const mammoth = await loadMammoth()
   const { value: html } = await mammoth.convertToHtml({ arrayBuffer: await file.arrayBuffer() })
   return html
 }
 
 async function docxToRawText(file: File): Promise<string> {
-  const mammoth = await import('mammoth')
+  const mammoth = await loadMammoth()
   const { value } = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() })
   return value
 }
@@ -358,7 +366,9 @@ export const docsConvert: ConverterModule = {
     const target = String(s.target ?? '')
     if (!target) throw new Error('该源格式暂不支持，请查看支持列表')
     if (!TARGETS[srcExt]?.some((t) => t.value === target)) {
-      throw new Error(`「${srcExt}」不能转换为「${target}」，请检查目标格式`)
+      throw new Error(
+        `「${file.name}」是 ${srcExt.toUpperCase()} 文件，与当前目标格式不匹配。请一次只添加同一种格式的文件，或移除其它格式的文件后重试`,
+      )
     }
     const base = baseName(file.name)
     ctx.onProgress(0.3)

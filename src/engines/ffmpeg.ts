@@ -29,11 +29,10 @@ let loadPromise: Promise<FFmpeg> | null = null
 let revokeUrls: string[] = []
 
 function detectMT(): boolean {
-  try {
-    return typeof crossOriginIsolated !== 'undefined' && crossOriginIsolated === true
-  } catch {
-    return false
-  }
+  // core-mt 在视频解码/重编码（x264、palettegen 等多线程路径）存在死锁问题，
+  // 音频等单线程路径正常。为可靠性起见固定使用单线程核心。
+  // 如需恢复：`return crossOriginIsolated === true`
+  return false
 }
 
 /** 下载 ffmpeg 核心三件套并转为 blob URL（多 CDN 容错 + Cache 持久化） */

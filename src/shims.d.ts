@@ -1,5 +1,15 @@
 /* 无类型声明包的本地 shim */
 
+/** mammoth 官方预打包浏览器版（绕开 bundler 对其 jszip/pako 依赖的去重损坏） */
+declare module 'mammoth/mammoth.browser.js' {
+  export interface MammothResult {
+    value: string
+    messages: unknown[]
+  }
+  export function convertToHtml(input: { arrayBuffer: ArrayBuffer }): Promise<MammothResult>
+  export function extractRawText(input: { arrayBuffer: ArrayBuffer }): Promise<MammothResult>
+}
+
 declare module 'gifenc' {
   export interface GifEncoderInstance {
     writeFrame(
