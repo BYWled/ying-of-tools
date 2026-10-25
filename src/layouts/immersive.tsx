@@ -69,7 +69,7 @@ function Footer() {
             <p>
               React 19 + Vite + Tailwind CSS · ffmpeg.wasm / pdf-lib / jSquash
             </p>
-            <p>© {new Date().getFullYear()} Banying · UI 风格参考「光谱」设计语言</p>
+            <p>© {new Date().getFullYear()} BYWled · 保留所有权利</p>
           </div>
         </div>
       </div>
