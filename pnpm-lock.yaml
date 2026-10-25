@@ -72,8 +72,8 @@ importers:
         specifier: ^1.1.0
         version: 1.5.2
       html2pdf.js:
-        specifier: ^0.10.3
-        version: 0.10.3
+        specifier: ^0.14.0
+        version: 0.14.0
       jsqr:
         specifier: ^1.4.0
         version: 1.4.0
@@ -140,7 +140,7 @@ importers:
     devDependencies:
       '@tailwindcss/vite':
         specifier: ^4.1.0
-        version: 4.3.3(vite@8.3.1(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0))
+        version: 4.3.3(vite@8.3.3(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0))
       '@types/node':
         specifier: ^24.0.0
         version: 24.19.0
@@ -161,7 +161,7 @@ importers:
         version: 5.0.6
       '@vitejs/plugin-react':
         specifier: ^6.0.0
-        version: 6.1.1(vite@8.3.1(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0))
+        version: 6.1.1(vite@8.3.3(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0))
       tailwindcss:
         specifier: ^4.1.0
         version: 4.3.3
@@ -172,8 +172,8 @@ importers:
         specifier: ^5.9.0
         version: 5.9.3
       vite:
-        specifier: ^8.0.0
-        version: 8.3.1(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0)
+        specifier: ^8.3.3
+        version: 8.3.3(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0)
 
 packages:
 
@@ -1707,9 +1707,6 @@ packages:
     resolution: {integrity: sha512-nGXts5znJzmWPu+mIE9izCOzdg63oJca2mDzGWWTth7sr4aCToKcoyFVBQwN75Ij5Pf6p510EwkTqViTRzDV+w==}
     engines: {node: '>=10.13.0'}
 
-  es6-promise@4.2.8:
-    resolution: {integrity: sha512-HJDGx5daxeIvxdBxvG2cb9g4tEvwIk3i8+nhX0yGrYmZUzbkdg8QbDevheDB8gd0//uPj4c1EQua8Q+MViT0/w==}
-
   esbuild@0.28.2:
     resolution: {integrity: sha512-HKVLS8dvII+xoKW9kmqxbRKrnWEXfJJr/FZhhJmiqIB0e053QNYFqOBouTMO/k5sID4MvCiUCvv8b9M4h32wIA==}
     engines: {node: '>=18'}
@@ -1784,8 +1781,8 @@ packages:
     resolution: {integrity: sha512-fPU6BHNpsyIhr8yyMpTLLxAbkaK8ArIBcmZIRiBLiDhjeqvXolaEmDGmELFuX9I4xDcaKKcJl+TKZLqruBbmWA==}
     engines: {node: '>=8.0.0'}
 
-  html2pdf.js@0.10.3:
-    resolution: {integrity: sha512-RcB1sh8rs5NT3jgbN5zvvTmkmZrsUrxpZ/RI8TMbvuReNZAdJZG5TMfA2TBP6ZXxpXlWf9NB/ciLXVb6W2LbRQ==}
+  html2pdf.js@0.14.0:
+    resolution: {integrity: sha512-yvNJgE/8yru2UeGflkPdjW8YEY+nDH5X7/2WG4uiuSCwYiCp8PZ8EKNiTAa6HxJ1NjC51fZSIEq6xld5CADKBQ==}
 
   idb-keyval@6.3.0:
     resolution: {integrity: sha512-um+2dgAWmYsu615EXpWVwSmapJhON0G43t3Ka/EVaohzPQXSMqKEqeDK/oIW3Ow+BXaF2PvSc+oBTFp793A5Ow==}
@@ -1834,8 +1831,8 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  jspdf@3.0.4:
-    resolution: {integrity: sha512-dc6oQ8y37rRcHn316s4ngz/nOjayLF/FFxBF4V9zamQKRqXxyiH1zagkCdktdWhtoQId5K20xt1lB90XzkB+hQ==}
+  jspdf@4.2.1:
+    resolution: {integrity: sha512-YyAXyvnmjTbR4bHQRLzex3CuINCDlQnBqoSYyjJwTP2x9jDLuKDzy7aKUl0hgx3uhcl7xzg32agn5vlie6HIlQ==}
 
   jsqr@1.4.0:
     resolution: {integrity: sha512-dxLob7q65Xg2DvstYkRpkYtmKm2sPJ9oFhrhmudT1dZvNFFTlroai3AWSpLey/w5vMcLBXRgOJsbXpdN9HzU/A==}
@@ -2450,8 +2447,8 @@ packages:
   utrie@1.0.2:
     resolution: {integrity: sha512-1MLa5ouZiOmQzUbjbu9VmjLzn1QLXBhwpUa7kdLUQK+KQ5KA9I1vk5U4YHe/X2Ch7PYnJfWuWT+VbuxbGwljhw==}
 
-  vite@8.3.1:
-    resolution: {integrity: sha512-/bvH9E9tmCXRGp2uXY3WbOldqpTwFkbha/8ANaEQ6VkxhH60KyqLwgZq6lG2y+4uT55x9+9eUHMpQ7uGnOCKjA==}
+  vite@8.3.3:
+    resolution: {integrity: sha512-cTAldKPImjg6c+gk48U19POPn3GCBzZwpdsN8ZMEEcbpes+6/wvfqUd0C2y3qYY4wsj8PwgFwrZ/1jBPVttMSg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -3768,12 +3765,12 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.3.3
       '@tailwindcss/oxide-win32-x64-msvc': 4.3.3
 
-  '@tailwindcss/vite@4.3.3(vite@8.3.1(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0))':
+  '@tailwindcss/vite@4.3.3(vite@8.3.3(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0))':
     dependencies:
       '@tailwindcss/node': 4.3.3
       '@tailwindcss/oxide': 4.3.3
       tailwindcss: 4.3.3
-      vite: 8.3.1(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0)
+      vite: 8.3.3(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0)
 
   '@tippyjs/react@4.2.6(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
@@ -3829,10 +3826,10 @@ snapshots:
 
   '@types/turndown@5.0.6': {}
 
-  '@vitejs/plugin-react@6.1.1(vite@8.3.1(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0))':
+  '@vitejs/plugin-react@6.1.1(vite@8.3.3(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
-      vite: 8.3.1(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0)
+      vite: 8.3.3(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0)
 
   '@xmldom/xmldom@0.8.15': {}
 
@@ -3968,7 +3965,6 @@ snapshots:
   dompurify@3.4.16:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
-    optional: true
 
   duck@0.1.12:
     dependencies:
@@ -3982,8 +3978,6 @@ snapshots:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.3.3
-
-  es6-promise@4.2.8: {}
 
   esbuild@0.28.2:
     optionalDependencies:
@@ -4069,11 +4063,11 @@ snapshots:
       css-line-break: 2.1.0
       text-segmentation: 1.0.3
 
-  html2pdf.js@0.10.3:
+  html2pdf.js@0.14.0:
     dependencies:
-      es6-promise: 4.2.8
+      dompurify: 3.4.16
       html2canvas: 1.4.1
-      jspdf: 3.0.4
+      jspdf: 4.2.1
 
   idb-keyval@6.3.0: {}
 
@@ -4106,7 +4100,7 @@ snapshots:
 
   json5@2.2.3: {}
 
-  jspdf@3.0.4:
+  jspdf@4.2.1:
     dependencies:
       '@babel/runtime': 7.29.7
       fast-png: 6.4.0
@@ -4709,7 +4703,7 @@ snapshots:
     dependencies:
       base64-arraybuffer: 1.0.2
 
-  vite@8.3.1(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0):
+  vite@8.3.3(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.7
