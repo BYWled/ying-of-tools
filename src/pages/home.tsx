@@ -4,9 +4,11 @@ import {
   ArrowDown,
   BadgeCheck,
   ChevronDown,
+  Github,
   Search,
   ShieldCheck,
   Sparkles,
+  Star,
   WifiOff,
   X,
   Zap,
@@ -15,8 +17,9 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { GlassCard } from '@/components/glass-card'
-import { CATEGORIES, POPULAR_TOOLS, TOOLS, TOOL_COUNT, type ToolDef } from '@/config/tools'
+import { CATEGORIES, CATEGORY_COUNT, POPULAR_TOOLS, TOOLS, TOOL_COUNT, type ToolDef } from '@/config/tools'
 import type { CategoryId } from '@/config/types'
+import { SITE } from '@/config/site'
 import { cn } from '@/lib/utils'
 
 /* ─────────────────────────── 背景光斑 ─────────────────────────── */
@@ -66,6 +69,13 @@ function Hero() {
           <Button size="lg" variant="outline" asChild>
             <a href="#why">它凭什么好用？</a>
           </Button>
+          <Button size="lg" variant="outline" asChild className="border-primary/40 text-primary hover:border-primary">
+            <a href={SITE.repo} target="_blank" rel="noreferrer">
+              <Star className="fill-current" />
+              去点个 Star
+              <Github className="opacity-70" />
+            </a>
+          </Button>
         </div>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
           <span className="text-muted-foreground mr-1 text-xs">热门：</span>
@@ -83,7 +93,7 @@ function Hero() {
       <div className="relative mx-auto mt-8 grid max-w-2xl grid-cols-2 gap-3 md:grid-cols-4">
         {[
           [String(TOOL_COUNT), '个实用工具'],
-          ['6', '大分类'],
+          [String(CATEGORY_COUNT), '大分类'],
           ['0', '次数据上传'],
           ['100%', '免费无限制'],
         ].map(([num, label]) => (

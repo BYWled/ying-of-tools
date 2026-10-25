@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
-import { Moon, Sun, Wrench } from 'lucide-react'
+import { Github, Moon, Sun, Wrench } from 'lucide-react'
 import { useTheme } from '@/components/theme-provider'
 import { Button } from '@/components/ui/button'
 import { SITE } from '@/config/site'
@@ -41,6 +41,11 @@ export function TopBar() {
       <div className="mx-auto flex h-full w-full max-w-6xl items-center justify-between px-4">
         <Logo />
         <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" asChild aria-label="GitHub 仓库" title="查看源码仓库">
+            <a href={SITE.repo} target="_blank" rel="noreferrer">
+              <Github className="size-5" />
+            </a>
+          </Button>
           <ThemeToggle />
         </div>
       </div>

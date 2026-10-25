@@ -1,6 +1,42 @@
+import type { FFmpeg } from '@ffmpeg/ffmpeg'
 import type { ConverterModule, Settings } from '@/config/types'
 import { baseName, extOf } from '@/lib/utils'
-import { runFFmpeg, useFfmpeg } from './ffmpeg'
+import { lastFfmpegLogs, runFFmpeg, useFfmpeg } from './ffmpeg'
+
+/** 在已写入输入文件的 ffmpeg 实例上执行命令并取回输出 Blob（多命令场景共用） */
+async function execToBlob(
+  ff: FFmpeg,
+  args: string[],
+  inName: string,
+  outName: string,
+  onProgress: (p: number) => void,
+  mime: string,
+): Promise<Blob> {
+  const handler = ({ progress }: { progress: number }) => onProgress(Math.max(0, Math.min(1, progress)))
+  ff.on('progress', handler)
+  try {
+    const code = await ff.exec(args)
+    if (code !== 0) {
+      const tail = lastFfmpegLogs(ff).split('\n').slice(-6).join('\n')
+      throw new Error(`转换失败（ffmpeg 退出码 ${code}）。${tail ? `日志末尾：\n${tail}` : ''}`)
+    }
+    const data = await ff.readFile(outName)
+    if (!(data instanceof Uint8Array) || data.length === 0) {
+      throw new Error('转换失败：输出为空，可能是编码器不支持当前参数或源文件损坏')
+    }
+    const buf = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength) as ArrayBuffer
+    return new Blob([buf], { type: mime })
+  } finally {
+    ff.off('progress', handler)
+    for (const f of [inName, outName]) {
+      try {
+        await ff.deleteFile(f)
+      } catch {
+        /* 忽略清理错误 */
+      }
+    }
+  }
+}
 
 const AUDIO_MIME: Record<string, string> = {
   mp3: 'audio/mpeg',
@@ -97,7 +133,7 @@ export const audioConvert: ConverterModule = {
   },
 }
 
-/* ─────────────────────────── 视频转换 ─────────────────────────── */
+/* ─────────────────────────── 视频转换（智能模式 + 速度档） ─────────────────────────── */
 
 function scaleFilter(s: Settings): string[] {
   const h = String(s.resolution ?? 'keep')
@@ -109,6 +145,30 @@ function fpsArgs(s: Settings): string[] {
   const fps = String(s.fps ?? 'keep')
   return fps === 'keep' ? [] : ['-r', fps]
 }
+
+/** 解析 ffmpeg 日志中的流编码（用于判断能否免转码直封装） */
+async function probeStreams(ff: FFmpeg, inName: string): Promise<{ video?: string; audio?: string }> {
+  // 独立收集本次探测的日志，避免与历史转换日志（含 Video: h264 输出行）混读误判
+  const lines: string[] = []
+  const handler = ({ message }: { message: string }) => lines.push(message)
+  ff.on('log', handler)
+  try {
+    // `-i` 无输出文件会以退出码 1 结束，但日志已含流信息
+    await ff.exec(['-i', inName])
+  } catch {
+    /* 预期非零退出 */
+  } finally {
+    ff.off('log', handler)
+  }
+  const logs = lines.join('\n')
+  const video = /Video: ([a-z0-9_]+)/i.exec(logs)?.[1]?.toLowerCase()
+  const audio = /Audio: ([a-z0-9_]+)/i.exec(logs)?.[1]?.toLowerCase()
+  return { video, audio }
+}
+
+/** 目标容器可直接封装的编码组合（浏览器/播放器广泛兼容的子集） */
+const MP4_REMUX = { video: ['h264'], audio: ['aac', 'mp3', 'ac3', 'eac3', 'alac'] }
+const WEBM_REMUX = { video: ['vp8', 'vp9', 'av1'], audio: ['vorbis', 'opus'] }
 
 export const videoConvert: ConverterModule = {
   fields: [
@@ -123,6 +183,29 @@ export const videoConvert: ConverterModule = {
       ],
     },
     {
+      key: 'mode',
+      label: '转换模式',
+      type: 'select',
+      default: 'smart',
+      options: [
+        { value: 'smart', label: '智能（编码兼容时直接封装，秒级完成）' },
+        { value: 'encode', label: '强制重新编码（改变清晰度 / 帧率时使用）' },
+      ],
+      hint: '智能模式先用 ffmpeg 探测输入编码：MP4 里的 H.264、WebM 里的 VP8/VP9 无需转码，仅重新封装，速度提升百倍',
+    },
+    {
+      key: 'speed',
+      label: '编码速度',
+      type: 'select',
+      default: 'ultrafast',
+      options: [
+        { value: 'ultrafast', label: '极速（体积较大）' },
+        { value: 'veryfast', label: '均衡（推荐）' },
+        { value: 'medium', label: '质量优先（较慢）' },
+      ],
+      showIf: (s) => s.mode === 'encode' || s.resolution !== 'keep' || s.fps !== 'keep',
+    },
+    {
       key: 'quality',
       label: '画质',
       type: 'select',
@@ -132,7 +215,7 @@ export const videoConvert: ConverterModule = {
         { value: '28', label: '均衡（推荐）' },
         { value: '33', label: '小（画质一般）' },
       ],
-      hint: 'WASM 转码速度有限，长视频请耐心等待',
+      showIf: (s) => s.mode === 'encode' || s.resolution !== 'keep' || s.fps !== 'keep',
     },
     {
       key: 'resolution',
@@ -163,21 +246,43 @@ export const videoConvert: ConverterModule = {
     const format = String(s.format)
     const inName = `in.${extOf(file.name) || 'bin'}`
     const outName = `out.${format}`
+    const needFilter = String(s.resolution) !== 'keep' || String(s.fps) !== 'keep'
+
+    const ff = await useFfmpeg.getState().load()
+    await ff.writeFile(inName, new Uint8Array(await file.arrayBuffer()))
+
+    // 智能模式：编码与容器兼容且不改滤镜时直接流复制（重封装）
+    if (s.mode !== 'encode' && !needFilter) {
+      const { video, audio } = await probeStreams(ff, inName)
+      const table = format === 'mp4' ? MP4_REMUX : WEBM_REMUX
+      const copyOk =
+        !!video &&
+        table.video.includes(video) &&
+        (!audio || table.audio.includes(audio))
+      if (copyOk) {
+        const args = [
+          '-i', inName,
+          '-c', 'copy',
+          ...(format === 'mp4' ? ['-movflags', '+faststart'] : []),
+          '-y', outName,
+        ]
+        const blob = await execToBlob(ff, args, inName, outName, ctx.onProgress,
+          format === 'mp4' ? 'video/mp4' : 'video/webm')
+        return [{ name: `${baseName(file.name)}.${format}`, blob }]
+      }
+    }
+
+    // 转码路径
+    const preset = String(s.speed ?? 'ultrafast')
     let args: string[]
     if (format === 'mp4') {
-      args = ['-i', inName, '-c:v', 'libx264', '-preset', 'veryfast', '-crf', String(s.quality), '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '128k', '-movflags', '+faststart']
+      args = ['-i', inName, '-c:v', 'libx264', '-preset', preset, '-crf', String(s.quality), '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '128k', '-movflags', '+faststart']
     } else {
-      args = ['-i', inName, '-c:v', 'libvpx', '-b:v', '1200k', '-c:a', 'libvorbis']
+      args = ['-i', inName, '-c:v', 'libvpx', '-b:v', '1200k', '-deadline', 'realtime', '-cpu-used', '5', '-c:a', 'libvorbis']
     }
     args = [...args, ...scaleFilter(s), ...fpsArgs(s), '-y', outName]
-    const blob = await runFFmpeg(
-      file,
-      inName,
-      outName,
-      args,
-      ctx.onProgress,
-      format === 'mp4' ? 'video/mp4' : 'video/webm',
-    )
+    const blob = await execToBlob(ff, args, inName, outName, ctx.onProgress,
+      format === 'mp4' ? 'video/mp4' : 'video/webm')
     return [{ name: `${baseName(file.name)}.${format}`, blob }]
   },
 }

@@ -94,10 +94,17 @@ function SimpleSelect({
   placeholder?: string
 }) {
   const [open, setOpen] = useState(false)
+  const label = options.find((o) => o.value === value)?.label
   return (
     <Select.Root open={open} onOpenChange={setOpen} value={value} onValueChange={onChange}>
       <SelectTrigger className={className} disabled={disabled}>
-        <SelectValue placeholder={placeholder} />
+        {/* 手动渲染选中文案并截断：Radix 的 SelectValue 对长文案会溢出触发器 */}
+        <span
+          className={cn('min-w-0 flex-1 truncate text-left', !label && 'text-muted-foreground')}
+          title={label ?? placeholder}
+        >
+          {label ?? placeholder}
+        </span>
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>

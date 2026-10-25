@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DropZone } from '@/components/converter/drop-zone'
 import { FileList } from '@/components/converter/file-list'
+import { MediaTrimPreview } from '@/components/converter/media-preview'
 import { SettingsPanel } from '@/components/converter/settings-panel'
 import { getTool, getCategory } from '@/config/tools'
 import { useQueue } from '@/stores/queue'
@@ -133,6 +134,9 @@ export default function BatchToolPage() {
             compact={items.length > 0}
           />
           {items.length > 0 && <FileList items={items} onRemove={queue.removeItem} />}
+
+          {/* 裁剪类工具：原生播放器实时预览 + 一键取起止点 */}
+          {['video-trim', 'audio-trim', 'video-to-gif'].includes(tool.id) && <MediaTrimPreview />}
 
           {mergeMode && running && (
             <Card className="p-4">

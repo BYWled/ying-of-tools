@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Check,
   ChevronDown,
@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { copyText, downloadBlob, formatBytes } from '@/lib/utils'
+import type { ResultFile } from '@/config/types'
 import type { QueueItem } from '@/stores/queue'
 
 function TypeIcon({ mime, className }: { mime: string; className?: string }) {
@@ -86,6 +87,22 @@ function TextPreview({ text }: { text: string }) {
   )
 }
 
+/** 音视频 / GIF 结果直接内联播放预览 */
+function MediaResult({ blob }: { blob: Blob }) {
+  const url = useMemo(() => URL.createObjectURL(blob), [blob])
+  useEffect(() => () => URL.revokeObjectURL(url), [url])
+  if (blob.type.startsWith('audio/')) {
+    return <audio controls src={url} className="mt-2 w-full" preload="metadata" />
+  }
+  if (blob.type.startsWith('video/')) {
+    return <video controls src={url} className="bg-muted mt-2 max-h-64 w-full rounded-lg" preload="metadata" />
+  }
+  if (blob.type === 'image/gif') {
+    return <img src={url} alt="GIF 预览" className="bg-muted mt-2 max-h-48 rounded-lg border" />
+  }
+  return null
+}
+
 export function FileRow({ item, onRemove }: { item: QueueItem; onRemove: (id: string) => void }) {
   return (
     <div className="bg-card flex items-start gap-3 rounded-xl border p-3">
@@ -110,18 +127,23 @@ export function FileRow({ item, onRemove }: { item: QueueItem; onRemove: (id: st
           <p className="text-destructive mt-1 text-xs leading-relaxed">{item.error}</p>
         )}
 
-        {item.results.map((r, idx) => (
-          <div key={idx} className="mt-2 flex flex-wrap items-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => downloadBlob(r.blob, r.name)}
-              className="max-w-xs"
-            >
-              <Download />
-              <span className="truncate">{r.name}</span>
-              <span className="text-muted-foreground shrink-0 text-xs">{formatBytes(r.blob.size)}</span>
-            </Button>
+        {item.results.map((r: ResultFile, idx) => (
+          <div key={idx}>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => downloadBlob(r.blob, r.name)}
+                className="max-w-xs"
+              >
+                <Download />
+                <span className="truncate">{r.name}</span>
+                <span className="text-muted-foreground shrink-0 text-xs">{formatBytes(r.blob.size)}</span>
+              </Button>
+            </div>
+            {['audio/', 'video/'].some((p) => r.blob.type.startsWith(p)) || r.blob.type === 'image/gif' ? (
+              <MediaResult blob={r.blob} />
+            ) : null}
           </div>
         ))}
         {item.results.some((r) => r.preview) && (
