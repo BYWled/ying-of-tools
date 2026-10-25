@@ -22,7 +22,11 @@ function ToolFallback() {
 
 function ScrollToTop() {
   const { pathname } = useLocation()
-  useEffect(() => window.scrollTo({ top: 0 }), [pathname])
+  // 注意必须用花括号体：新 Chrome 的 window.scrollTo(options) 返回 Promise，
+  // 若作为 effect 返回值会被 React 当作清理函数，路由切换时崩溃白屏
+  useEffect(() => {
+    window.scrollTo({ top: 0 })
+  }, [pathname])
   return null
 }
 
