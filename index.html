@@ -4,14 +4,90 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0d1f1d" />
+
+    <!-- 基础 SEO（各工具页由构建脚本覆盖为专属内容） -->
+    <title data-seo-title>伴莺的工具箱 · 免费在线工具集：格式转换 / PDF / 图片 / 音视频 / 文本</title>
     <meta
+      data-seo-desc
       name="description"
-      content="伴莺的工具箱 — 纯前端文件工具集：格式转换、图片编辑、GIF 处理、PDF 操作。所有处理均在浏览器本地完成，文件永不上传。"
+      content="57 个免费在线工具：图片格式转换与压缩、PDF 合并拆分加密、视频转 GIF、音频剪辑提取、HEIC 转 JPG、OCR 文字识别、二维码、文本差异对比、时间戳 / JSON / 正则等开发工具。全部在浏览器本地处理，文件不上传，无需注册。"
     />
-    <title>伴莺的工具箱 · 纯前端文件工具集</title>
+    <meta
+      data-seo-keywords
+      name="keywords"
+      content="在线工具,免费工具,格式转换,图片压缩,PDF合并,PDF转图片,视频转GIF,音频转换,HEIC转JPG,OCR文字识别,二维码生成,录音机,文字转语音,文本差异对比,时间戳转换,JSON格式化,正则测试,文件哈希"
+    />
+    <link data-seo-canonical rel="canonical" href="https://tools.wled.top/" />
+
+    <!-- Open Graph / Twitter -->
+    <meta property="og:type" content="website" />
+    <meta data-seo-og-title property="og:title" content="伴莺的工具箱 · 免费在线工具集" />
+    <meta
+      data-seo-og-desc
+      property="og:description"
+      content="57 个免费在线工具，全部浏览器本地处理、文件不上传：格式转换、PDF、图片、音视频、文本与开发工具。"
+    />
+    <meta property="og:url" content="https://tools.wled.top/" />
+    <meta property="og:image" content="https://tools.wled.top/favicon.svg" />
+    <meta property="og:site_name" content="伴莺的工具箱" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="伴莺的工具箱 · 免费在线工具集" />
+    <meta name="twitter:description" content="57 个免费在线工具，浏览器本地处理、文件不上传。" />
+
+    <!-- 结构化数据（首页；工具页由构建脚本替换为该工具的专属条目） -->
+    <script data-seo-jsonld type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "伴莺的工具箱",
+        "url": "https://tools.wled.top/",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Web",
+        "description": "57 个免费在线工具：格式转换、PDF、图片、音视频、文本与开发工具，全部浏览器本地处理，文件不上传。",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+      }
+    </script>
+    <script data-seo-faq type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "我的文件真的不会被上传吗？",
+            "acceptedAnswer": { "@type": "Answer", "text": "不会。网站是纯静态页面，没有后端服务器：所有转换都在你的浏览器内存中完成，处理结果也直接从本地下载。" }
+          },
+          {
+            "@type": "Question",
+            "name": "为什么音视频工具首次使用要「加载引擎」？",
+            "acceptedAnswer": { "@type": "Answer", "text": "音视频转码由 ffmpeg.wasm（WebAssembly 版 FFmpeg）完成。首次使用下载一次并持久缓存在浏览器，之后不再重复下载；同格式转换会自动跳过转码直接封装，几秒即可完成。" }
+          },
+          {
+            "@type": "Question",
+            "name": "大文件转换会卡住电脑吗？",
+            "acceptedAnswer": { "@type": "Answer", "text": "批量任务按顺序逐个执行，避免多个大文件同时占满内存。视频转码速度取决于文件时长与画质，图片与文档转换基本秒级完成。" }
+          },
+          {
+            "@type": "Question",
+            "name": "支持哪些浏览器？",
+            "acceptedAnswer": { "@type": "Answer", "text": "推荐最新版的 Chrome / Edge / Firefox / Safari。图片编解码基于 WebAssembly，不依赖浏览器原生支持，各平台能力一致。" }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <h1>伴莺的工具箱 · 免费在线工具集</h1>
+      <p>
+        57 个免费在线工具：图片格式转换与压缩、PDF 合并拆分加密、视频转 GIF、音频剪辑、HEIC 转 JPG、OCR
+        文字识别、二维码、文本差异对比、时间戳 / JSON / 正则等开发工具。所有处理在浏览器本地完成，文件不上传。
+      </p>
+      <p>本站需要启用 JavaScript 才能使用（纯静态站，无任何后端）。</p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -12,6 +12,7 @@ import { SettingsPanel } from '@/components/converter/settings-panel'
 import { getTool, getCategory } from '@/config/tools'
 import { useQueue } from '@/stores/queue'
 import { useFfmpeg } from '@/engines/ffmpeg'
+import { setSeo, TOOL_SEO_SUFFIX } from '@/lib/seo'
 import { zipResults } from '@/lib/zip'
 
 function EngineBanner() {
@@ -61,6 +62,13 @@ export default function BatchToolPage() {
     if (tool?.batch) queue.initTool(tool.id, tool.batch)
     // 进入 ffmpeg 工具页立即后台预热引擎，用户添加文件时已就绪
     if (tool?.needsEngine === 'ffmpeg') void useFfmpeg.getState().load().catch(() => {})
+    // SPA 路由级 SEO：每个工具独立标题与描述
+    if (tool) {
+      setSeo({
+        title: `${tool.title} ${TOOL_SEO_SUFFIX}`,
+        description: `${tool.desc}。纯浏览器本地处理，文件不上传，免费无限制。`,
+      })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toolId])
 

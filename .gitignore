@@ -6,3 +6,5 @@ test-fixtures
 gui-test-screenshots
 *.local
 .DS_Store
+public/sitemap.xml
+dist/fixtures/

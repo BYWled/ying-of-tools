@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/copy-ffmpeg.mjs && vite",
-    "build": "node scripts/copy-ffmpeg.mjs && tsc -b && vite build",
+    "build": "node scripts/copy-ffmpeg.mjs && node scripts/generate-seo.mjs pre && tsc -b && vite build && node scripts/generate-seo.mjs post",
     "preview": "vite preview",
     "typecheck": "tsc -b"
   },

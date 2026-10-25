@@ -20,6 +20,7 @@ import { GlassCard } from '@/components/glass-card'
 import { CATEGORIES, CATEGORY_COUNT, POPULAR_TOOLS, TOOLS, TOOL_COUNT, type ToolDef } from '@/config/tools'
 import type { CategoryId } from '@/config/types'
 import { SITE } from '@/config/site'
+import { HOME_SEO, setSeo } from '@/lib/seo'
 import { cn } from '@/lib/utils'
 
 /* ─────────────────────────── 背景光斑 ─────────────────────────── */
@@ -391,7 +392,7 @@ const FAQS = [
   },
   {
     q: '为什么音视频工具首次使用要「加载引擎」？',
-    a: '音视频转码由 ffmpeg.wasm（约 32 MB 的 WebAssembly 版 FFmpeg）完成。首次使用下载一次，浏览器缓存后，之后访问不再重复下载，并且可以离线使用。如果你的浏览器与站点处于跨源隔离状态，会自动启用多线程核心，速度更快。',
+    a: '音视频转码由 ffmpeg.wasm（约 32 MB 的 WebAssembly 版 FFmpeg）完成。首次使用下载一次并持久缓存在浏览器，之后访问不再重复下载，断网也能继续使用。同格式转换（如 MP4 转 MP4）会自动跳过转码直接封装，几秒即可完成。',
   },
   {
     q: 'DOCX 转 PDF 的效果如何？',
@@ -431,6 +432,10 @@ function Faq() {
 }
 
 export default function Home() {
+  // 回到首页时恢复站点级标题与描述
+  useEffect(() => {
+    setSeo(HOME_SEO)
+  }, [])
   return (
     <div className="space-y-2">
       <Hero />
